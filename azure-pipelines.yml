@@ -4,19 +4,47 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/java
 
 trigger:
-- main
+- none
 
-pool:
-  vmImage: ubuntu-latest
+jobs:
+- job: CreateWindows10VMWithTerraform
+  pool:
+    vmImage: 'windows-latest'
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '3.x'
+      addToPath: true
+  - task: Maven@3
+    inputs:
+      mavenPomFile: 'pom.xml'
+      mavenOptions: '-Xmx3072m'
+      javaHomeOption: 'JDKVersion'
+      jdkVersionOption: '1.8'
+      jdkArchitectureOption: 'x64'
+      publishJUnitResults: true
+      testResultsFiles: '**/surefire-reports/TEST-*.xml'
+      goals: 'package'
+      
+  - script: |
+      python -m pip install --upgrade pip
+      pip install requests
+    displayName: 'Install Python requests library'
 
-steps:
-- task: Maven@3
-  inputs:
-    mavenPomFile: 'pom.xml'
-    mavenOptions: '-Xmx3072m'
-    javaHomeOption: 'JDKVersion'
-    jdkVersionOption: '1.8'
-    jdkArchitectureOption: 'x64'
-    publishJUnitResults: true
-    testResultsFiles: '**/surefire-reports/TEST-*.xml'
-    goals: 'package'
+  - script: |
+      terraform --version
+    displayName: 'Terraform Version'
+
+  - script: |
+      az login --service-principal -u 0cd2a780-3598-4328-8db8-8b7ba273e024 -p 7wj8Q~ZoQE19B3yHSRlA9XoXzu63nIHjCWuI8a1Z --tenant c86959ed-45e5-47f5-8ef5-308ca79916fc
+      cd $(Agent.BuildDirectory)
+      git clone https://github.com/hashicorp/learn-terraform-azure.git
+      cd learn-terraform-azure
+
+      terraform init
+      terraform plan -out=tfplan -var="prefix=mywindowsvm" -var="location=eastus"
+      terraform apply -auto-approve tfplan
+    displayName: 'Create Windows 10 VM with Terraform'
+
+
+
