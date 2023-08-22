@@ -25,8 +25,9 @@ jobs:
       publishJUnitResults: true
       testResultsFiles: '**/surefire-reports/TEST-*.xml'
       goals: 'package'
+      
   - task: HashiCorpTerraformInstaller@0
-  displayName: 'Install Terraform'
+    displayName: 'Install Terraform'
     inputs:
       terraformVersion: latest
       
