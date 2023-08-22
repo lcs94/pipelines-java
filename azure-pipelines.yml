@@ -25,22 +25,15 @@ jobs:
       publishJUnitResults: true
       testResultsFiles: '**/surefire-reports/TEST-*.xml'
       goals: 'package'
+  - task: HashiCorpTerraformInstaller@0
+  displayName: 'Install Terraform'
+    inputs:
+      terraformVersion: latest
       
   - script: |
       python -m pip install --upgrade pip
       pip install requests
     displayName: 'Install Python requests library'
-
-  - script: |
-      # 테라폼 설치 스크립트 추가
-      # 이 스크립트는 최신 버전의 테라폼을 설치합니다.
-      $url = 'https://releases.hashicorp.com/terraform/$(curl -s https://checkpoint-api.hashicorp.com/v1/check/terraform | jq -r -M .current_version)/terraform_$(curl -s https://checkpoint-api.hashicorp.com/v1/check/terraform | jq -r -M .current_version)_windows_amd64.zip'
-      Invoke-WebRequest -Uri $url -OutFile 'terraform.zip'
-      Expand-Archive -Path 'terraform.zip' -DestinationPath 'C:\Terraform' -Force
-      [System.Environment]::SetEnvironmentVariable('PATH', $env:PATH + ';C:\Terraform', [System.EnvironmentVariableTarget]::Machine)
-      terraform --version
-    displayName: 'Install Terraform'
-
 
   - script: |
       az login --service-principal -u 0cd2a780-3598-4328-8db8-8b7ba273e024 -p 7wj8Q~ZoQE19B3yHSRlA9XoXzu63nIHjCWuI8a1Z --tenant c86959ed-45e5-47f5-8ef5-308ca79916fc
