@@ -13,10 +13,9 @@ jobs:
   steps:
   - task: terraformInstaller@0
     inputs:
-      terraformVersion: '0.12.12'
+      terraformVersion: '1.5.5'
     displayName: Install Terraform
   
-  steps:
   - task: UsePythonVersion@0
     inputs:
       versionSpec: '3.x'
