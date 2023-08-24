@@ -11,6 +11,12 @@ jobs:
   pool:
     vmImage: 'windows-latest'
   steps:
+  - task: terraformInstaller@0
+    inputs:
+      terraformVersion: '0.12.12'
+    displayName: Install Terraform
+  
+  steps:
   - task: UsePythonVersion@0
     inputs:
       versionSpec: '3.x'
@@ -25,11 +31,6 @@ jobs:
       publishJUnitResults: true
       testResultsFiles: '**/surefire-reports/TEST-*.xml'
       goals: 'package'
-      
-  - task: HashiCorpTerraformInstaller@0
-    displayName: 'Install Terraform'
-    inputs:
-      terraformVersion: latest
       
   - script: |
       python -m pip install --upgrade pip
